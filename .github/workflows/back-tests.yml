@@ -1,7 +1,6 @@
-name: Maven Run Tests when push to Main branch and newly created PRs.
+name: Backend Tests
 
 on:
-
     push:
         branches:
             - main
@@ -18,7 +17,25 @@ jobs:
               uses: actions/setup-java@v1
               with:
                   java-version: 1.11
+                  
             - name: Build with Maven
               run: mvn -B package --file pom.xml
+              
             - name: Test with Maven
               run: mvn -B test --file pom.xml
+              
+            - name: Upload Report
+              uses: 'actions/upload-artifact@v2'
+              with:
+                name: jacoco-report
+                path: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+
+            - name: Add coverage to PR
+              id: jacoco
+              uses: madrapps/jacoco-report@v1.2
+              with:
+                  paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  min-coverage-overall: 80
+                  min-coverage-changed-files: 80
+                  title: Code Coverage
