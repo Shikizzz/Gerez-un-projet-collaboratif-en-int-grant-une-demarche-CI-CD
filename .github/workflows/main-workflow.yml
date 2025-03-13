@@ -46,10 +46,10 @@ jobs:
                 SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
               with:
                 projectBaseDir: ./back
-                args: >
-                  -Dsonar.projectKey=shikizzz_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD_BACK
-                  -Dsonar.organization=shikizzz
-                  -Dsonar.java.binaries=target/classes
+                #args: >
+                #  -Dsonar.projectKey=shikizzz_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD_BACK
+                #  -Dsonar.organization=shikizzz
+                #  -Dsonar.java.binaries=target/classes
 
     front-tests:
         runs-on: ubuntu-latest
@@ -88,7 +88,7 @@ jobs:
             with:
                 projectBaseDir: ./front
                 #args: >
-                #    -Dsonar.projectKey=shikizzz_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD_Front
+                #    -Dsonar.projectKey=shikizzz_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD_FRONT
                 #    -Dsonar.organization=shikizzz
 
     
