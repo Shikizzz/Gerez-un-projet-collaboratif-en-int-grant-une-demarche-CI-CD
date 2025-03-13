@@ -89,7 +89,6 @@ jobs:
             with:
               projectBaseDir: ./back
               args: >
-                -Dsonar.java.binaries=target/classes
                 -Dsonar.projectKey=shikizzz_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD_BACK
                 -Dsonar.organization=shikizzz
             
