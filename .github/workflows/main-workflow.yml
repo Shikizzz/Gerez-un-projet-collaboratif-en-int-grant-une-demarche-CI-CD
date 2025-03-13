@@ -99,7 +99,7 @@ jobs:
               SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
               SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
             with:
-              projectBaseDir: backend 
+              projectBaseDir: backend/
 
             
     sonar-front:
