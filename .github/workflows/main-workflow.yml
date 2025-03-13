@@ -87,8 +87,8 @@ jobs:
               SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
             with:
                 projectBaseDir: ./front
-                args: >
-                    -Dsonar.projectKey=shikizzz_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD_BACK
-                    -Dsonar.organization=shikizzz
+                #args: >
+                #    -Dsonar.projectKey=shikizzz_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD_Front
+                #    -Dsonar.organization=shikizzz
 
     
