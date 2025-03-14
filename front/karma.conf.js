@@ -38,6 +38,7 @@ module.exports = function (config) {
         { type: 'html' },
         { type: 'text-summary' },
         { type: 'json-summary' }
+        { type: 'lcov' }
       ]
     },
     reporters: ['progress', 'kjhtml'],
