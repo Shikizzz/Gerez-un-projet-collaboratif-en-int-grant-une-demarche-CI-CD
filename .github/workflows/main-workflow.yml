@@ -9,7 +9,7 @@ on:
             - main
                
 jobs:
-    back-tests:
+    back:
         runs-on: windows-latest
         steps:
             - uses: actions/checkout@v2
@@ -29,29 +29,42 @@ jobs:
               with:
                   name: jacoco-report
                   path: ${{ github.workspace }}/back/target/site/jacoco
-                
-            - name: Add coverage to PR
-              id: jacoco
-              uses: madrapps/jacoco-report@v1.7.1
-              with:
-                  paths: ${{ github.workspace }}/back/target/site/jacoco/jacoco.xml
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  min-coverage-overall: 70
-                  min-coverage-changed-files: 70
 
-            - name: Scan
+            - name: Scan Back with Sonar
               uses: SonarSource/sonarcloud-github-action@master
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACK }}
               with:
                 projectBaseDir: ./back
-                #args: >
-                #  -Dsonar.projectKey=shikizzz_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD_BACK
-                #  -Dsonar.organization=shikizzz
-                #  -Dsonar.java.binaries=target/classes
 
-    front-tests:
+            - name: Extract Docker image metadata
+              id: meta
+              uses: docker/metadata-action@v5
+              with:
+                images: ${{ vars.DOCKER_USERNAME }}/back-image
+                projectBaseDir: ./back
+        
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ vars.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
+        
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+              
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v6
+              with:
+                push: ${{ github.event_name != 'pull_request' }}
+                tags: ${{ steps.meta.outputs.tags }}
+                annotations: ${{ steps.meta.outputs.annotations }}
+                provenance: true
+                sbom: true
+            
+
+    front:
         runs-on: ubuntu-latest
         defaults:
           run:
@@ -72,23 +85,13 @@ jobs:
             with:
                 name: front-report
                 path: ${{ github.workspace }}/front/coverage/bobapp
-    
-          - name: Comment Test Coverage
-            uses: AthleticNet/comment-test-coverage@1.1
-            with:
-              token: ${{ secrets.GITHUB_TOKEN }}
-              path: front/coverage/bobapp/coverage-summary.json
-              title: Karma Test Coverage
 
-          - name: SonarCloud Scan
+          - name: Scan Front with Sonar
             uses: SonarSource/sonarcloud-github-action@master
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT }}
             with:
                 projectBaseDir: ./front
-                #args: >
-                #    -Dsonar.projectKey=shikizzz_Gerez-un-projet-collaboratif-en-int-grant-une-demarche-CI-CD_FRONT
-                #    -Dsonar.organization=shikizzz
 
     
