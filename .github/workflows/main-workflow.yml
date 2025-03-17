@@ -12,17 +12,17 @@ jobs:
     back:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+        
+            - uses: actions/checkout@v4
+            
             - name: Set up JDK 11
-              uses: actions/setup-java@v1
+              uses: actions/setup-java@v4
               with:
+                  distribution: 'temurin'
                   java-version: 11.0
-                  
-            - name: Build with Maven
-              run: mvn -B package --file back/pom.xml
               
-            - name: Test with Maven
-              run: mvn -B test --file back/pom.xml
+            - name: Test and Package with Maven Verify
+              run: mvn -B verify --file back/pom.xml
               
             - name: Upload Reports
               uses: 'actions/upload-artifact@v4'
@@ -71,7 +71,9 @@ jobs:
             working-directory: front
             
         steps:
-          - uses: actions/checkout@v2
+        
+          - uses: actions/checkout@v4
+          
           - name: Use Node.js ${{ matrix.node-version }}
             uses: actions/setup-node@v1
             with:
