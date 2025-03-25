@@ -9,7 +9,8 @@ on:
             - main
                
 jobs:
-    back:
+
+    tests-back:
         runs-on: ubuntu-latest
         steps:
         
@@ -38,33 +39,7 @@ jobs:
               with:
                 projectBaseDir: ./back
 
-            - name: Extract Docker image metadata
-              id: meta
-              uses: docker/metadata-action@v5
-              with:
-                images: ${{ vars.DOCKER_USERNAME }}/back-image
-        
-            - name: Log in to Docker Hub
-              uses: docker/login-action@v3
-              with:
-                username: ${{ vars.DOCKER_USERNAME }}
-                password: ${{ secrets.DOCKER_PASSWORD }}
-        
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
-              
-            - name: Build and push Docker image
-              uses: docker/build-push-action@v6
-              with:
-                context: ./back
-                push: ${{ github.event_name != 'pull_request' }}
-                tags: ${{ steps.meta.outputs.tags }}
-                annotations: ${{ steps.meta.outputs.annotations }}
-                provenance: true
-                sbom: true
-
-            
-    front:
+    tests-front:
         runs-on: ubuntu-latest
         defaults:
           run:
@@ -96,29 +71,51 @@ jobs:
             with:
                 projectBaseDir: ./front
 
-          - name: Extract Docker image metadata
-            id: meta
-            uses: docker/metadata-action@v5
-            with:
-              images: ${{ vars.DOCKER_USERNAME }}/front-image
-        
-          - name: Log in to Docker Hub
-            uses: docker/login-action@v3
-            with:
-              username: ${{ vars.DOCKER_USERNAME }}
-              password: ${{ secrets.DOCKER_PASSWORD }}
-        
-          - name: Set up Docker Buildx
-            uses: docker/setup-buildx-action@v3
-              
-          - name: Build and push Docker image
-            uses: docker/build-push-action@v6
-            with:
-              context: ./front
-              push: ${{ github.event_name != 'pull_request' }}
-              tags: ${{ steps.meta.outputs.tags }}
-              annotations: ${{ steps.meta.outputs.annotations }}
-              provenance: true
-              sbom: true
+    docker:
+        needs: [tests-back, tests-front]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-    
+            - name: Extract Docker image metadata
+              id: meta-back
+              uses: docker/metadata-action@v5
+              with:
+                images: ${{ vars.DOCKER_USERNAME }}/back-image
+        
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ vars.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
+        
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+              
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v6
+              with:
+                context: ./back
+                push: ${{ github.event_name != 'pull_request' }}
+                tags: ${{ steps.meta.outputs.tags }}
+                annotations: ${{ steps.meta.outputs.annotations }}
+                provenance: true
+                sbom: true
+
+
+            - name: Extract Docker image metadata
+              id: meta-front
+              uses: docker/metadata-action@v5
+              with:
+                images: ${{ vars.DOCKER_USERNAME }}/front-image
+              
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v6
+              with:
+                context: ./front
+                push: ${{ github.event_name != 'pull_request' }}
+                tags: ${{ steps.meta.outputs.tags }}
+                annotations: ${{ steps.meta.outputs.annotations }}
+                provenance: true
+                sbom: true
